@@ -38,7 +38,7 @@ const Editor = () => {
 
     useEffect(()=>{
              dispatch(fetchFileTree(projectId)).then((response)=>{
-                  console.log(response, "ye h response iska")
+                 
                 });
     })
 

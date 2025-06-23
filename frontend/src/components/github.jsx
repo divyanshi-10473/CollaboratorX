@@ -49,7 +49,7 @@ dispatch(loginWithGitHub(code)).then((res) => {
       });
       navigate("/login");
     }
-  }, []);
+  },  [dispatch, navigate]);
 
   return (
     <div className="flex justify-center items-center min-h-screen text-center p-6">

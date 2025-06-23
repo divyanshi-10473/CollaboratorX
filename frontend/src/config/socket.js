@@ -9,12 +9,19 @@ export const initializeSocket = (projectId) => {
     return null;
   }
 
-  if (!socketInstance) {
-    socketInstance = io(import.meta.env.VITE_SOCKET_URL, {
-      query: { projectId },
-      transports: ['websocket'],
-      withCredentials: true,
-    });
+
+const token = JSON.parse(sessionStorage.getItem("token")); // or localStorage
+
+if (!socketInstance) {
+  socketInstance = io(import.meta.env.VITE_SOCKET_URL, {
+    query: { projectId },
+    transports: ['websocket'],
+    auth: {
+      token: token, 
+    },
+  });
+
+
 
     socketInstance.on('connect_error', (err) => {
       console.error('Socket connection error:', err.message);

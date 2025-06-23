@@ -79,20 +79,32 @@ export const loginUser = async (req, res) => {
       JWT_SECRET,
       { expiresIn: '1h' }
     );
-    res
-      .cookie('token', token, {
-        httpOnly: true,
-        secure: false,
-      })
-      .json({
-        success: true,
-        message: 'Logged in successfully',
-        user: {
+    // res
+    //   .cookie('token', token, {
+    //     httpOnly: true,
+    //     secure: false,
+    //   })
+    //   .json({
+    //     success: true,
+    //     message: 'Logged in successfully',
+    //     user: {
+    //       email: Checkuser.email,
+    //       username: Checkuser.username,
+    //       id: Checkuser._id,
+    //     },
+    //   });
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged in successfully',
+      token,
+      user: {
           email: Checkuser.email,
           username: Checkuser.username,
           id: Checkuser._id,
         },
-      });
+
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -109,7 +121,8 @@ export const logoutUser = (req, res) => {
 };
 
 export const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
   if (!token) {
     return res.status(401).json({ success: false, message: 'Please login to access this resource' });
   }
@@ -167,18 +180,30 @@ export const loginWithGithub = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-    }).json({
+    // res.cookie('token', token, {
+    //   httpOnly: true,
+    //   secure: false,
+    // }).json({
+    //   success: true,
+    //   message: 'Logged in with GitHub successfully',
+    //   user: {
+    //     id: user._id,
+    //     username: user.username,
+    //     email: user.email,
+    //   },
+    // });
+
+        res.status(200).json({
       success: true,
-      message: 'Logged in with GitHub successfully',
+      message: 'Logged in successfully',
+      token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
       },
-    });
+
+    })
 
   } catch (error) {
     console.error('GitHub login error:', error);

@@ -51,7 +51,7 @@ useEffect(() => {
   if (terminalRef.current) {
     terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
   }
-  console.log(terminalOutput,"ye termianl output h")
+ 
 }, [terminalOutput]);
 
 useEffect(() => {
@@ -59,7 +59,7 @@ useEffect(() => {
   if (!socket || !projectId) return;
 
   const handleFileTreeUpdate = () => {
-    console.log("fileTreeUpdated received in Editor");
+   
     dispatch(fetchFileTree(projectId));
   };
 

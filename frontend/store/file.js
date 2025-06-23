@@ -7,7 +7,13 @@ const initialState = {
   FileTrees:{},
 };
 
-
+const getAuthHeader = () => {
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 
 
@@ -17,7 +23,7 @@ export const fetchFileTree = createAsyncThunk(
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_SOCKET_URL}/file/get/${projectId}`,
-        { withCredentials: true }
+        { headers: getAuthHeader()}
       );
       return response?.data;
     } catch (err) {
@@ -39,9 +45,9 @@ export const updateFileContent = createAsyncThunk(
       const response = await axios.put(
         `${import.meta.env.VITE_SOCKET_URL}/file/update`,
         { projectId, filename, content },
-        { withCredentials: true }
+        { headers: getAuthHeader(), }
       );
-      console.log(response.data.data.fileTree," iska response chahiye")
+     
       return response.data.data.fileTree; // return for updating local state
     } catch (err) {
       if (err.response && err.response.data) {
@@ -62,7 +68,7 @@ export const deleteFileFromProject = createAsyncThunk(
       const response = await axios.put(
         `${import.meta.env.VITE_SOCKET_URL}/file/delete`,
         { projectId, filename },
-        { withCredentials: true }
+        { headers: getAuthHeader()}
       );
       return { filename }; // return to remove from local Redux state
     } catch (err) {
@@ -79,7 +85,7 @@ export const renameFileInProject = createAsyncThunk(
       const response = await axios.put(
         `${import.meta.env.VITE_SOCKET_URL}/file/rename`,
         { projectId, oldFilename, newFilename },
-        { withCredentials: true }
+        { headers: getAuthHeader() }
       );
       return { oldFilename, newFilename }; // update local Redux state
     } catch (err) {

@@ -98,7 +98,7 @@ const WriteAiMessage = (msg) => {
 
   useEffect(()=>{
     dispatch(fetchMessagesByProject(projectId))
-  },[messagesList])
+  },[dispatch, projectId])
 
 
   useEffect(() => {

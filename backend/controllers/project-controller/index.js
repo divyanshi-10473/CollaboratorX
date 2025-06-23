@@ -5,8 +5,7 @@ import Project from "../../models/project.js";
 export const createProject = async (req, res) => {
   try {
     const { name } = req.body;
-    console.log("Creating project with name:", name);
-
+  
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return res.status(400).json({ message: 'Project name is required.' });
     }

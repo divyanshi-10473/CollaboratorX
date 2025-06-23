@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutUser } from '../../store/auth';
+import { logoutUser, resetTokenAndCredentials } from '../../store/auth';
 import {
   Dialog,
   DialogContent,
@@ -48,7 +48,10 @@ const Project = () => {
 
 
   function handleLogout() {
-    dispatch(logoutUser());
+    // dispatch(logoutUser());
+    dispatch(resetTokenAndCredentials());
+    sessionStorage.clear();
+    navigate('/login');
     toast.success('Logged out successfully', { position: 'bottom-right' });
   }
 

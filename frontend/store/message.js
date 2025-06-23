@@ -9,6 +9,13 @@ const initialState = {
 
 
 
+const getAuthHeader = () => {
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
 
  export const sendMessages = createAsyncThunk(
   "messages/sendMessage",
@@ -19,7 +26,7 @@ const initialState = {
         `${import.meta.env.VITE_SOCKET_URL}/message/send`,
         messageData,
         {
-          withCredentials: true,
+          headers: getAuthHeader(),
         }
       );
       return response.data;
@@ -38,7 +45,7 @@ export const fetchMessagesByProject = createAsyncThunk(
   async (projectId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/message/fetch/${projectId}`, {
-        withCredentials: true,
+        headers: getAuthHeader()
       });
       return response.data;
     } catch (err) {
@@ -56,9 +63,9 @@ export const deleteConversation = createAsyncThunk(
   'messages/deleteConversation',
   async (projectId, { rejectWithValue }) => {
     try {
-      console.log("Deleting conversation for projectId:", projectId);
+     
       const res = await axios.delete(`${import.meta.env.VITE_SOCKET_URL}/message/clear/${projectId}`, {
-        withCredentials: true,
+        headers: getAuthHeader()
       });
       return res?.data; // just return projectId for clearing state
     } catch (err) {

@@ -7,6 +7,15 @@ const initialState = {
   inviteProject:[],
 };
 
+
+const getAuthHeader = () => {
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 export const inviteCollaborator = createAsyncThunk(
   'projects/inviteCollaborator',
   async ({ projectId, invitedUserId }, { rejectWithValue }) => {
@@ -14,7 +23,7 @@ export const inviteCollaborator = createAsyncThunk(
       const response = await axios.post(
         `${import.meta.env.VITE_SOCKET_URL}/projectInvites/send`,
         { projectId, invitedUserId },
-        { withCredentials: true }
+        { headers: getAuthHeader() }
       );
 
       return response?.data;
@@ -34,7 +43,7 @@ export const fetchInvitesByProjectId = createAsyncThunk(
   async (projectId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/projectInvites/get/${projectId}`, {
-        withCredentials: true,
+        headers: getAuthHeader(),
       });
       return response.data.invites; 
     } catch (err) {
@@ -53,7 +62,7 @@ export const fetchUserInvites = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/projectInvites/fetch`, {
-        withCredentials: true,
+       headers: getAuthHeader(),
       });
       return response.data;
     } catch (err) {
@@ -69,7 +78,7 @@ export const acceptInvite = createAsyncThunk(
       const response = await axios.post(
         `${import.meta.env.VITE_SOCKET_URL}/projectInvites/accept/${inviteId}`,
         {},
-        { withCredentials: true } 
+        { headers: getAuthHeader() } 
       );
       return response.data;
     } catch (err) {
@@ -85,7 +94,7 @@ export const rejectInvite = createAsyncThunk(
       const response = await axios.put(
         `${import.meta.env.VITE_SOCKET_URL}/projectInvites/reject/${inviteId}`,
         {},
-        { withCredentials: true }
+        { headers: getAuthHeader()}
       );
       return response.data; // ✅ You missed returning this
     } catch (err) {
@@ -99,7 +108,7 @@ export const deleteInvite = createAsyncThunk(
   async (inviteId, { rejectWithValue }) => {
     try {
       const res = await axios.delete(`${import.meta.env.VITE_SOCKET_URL}/projectInvites/delete/${inviteId}`,{
-      withCredentials: true,
+      headers: getAuthHeader(),
       })
       return { inviteId };
     } catch (err) {
@@ -121,7 +130,7 @@ const inviteSlice = createSlice({
       })
       .addCase(fetchInvitesByProjectId.fulfilled, (state, action) => {
         state.isLoading = false;
-        console.log('Fetched invites:', action.payload);
+       
         state.invites = action?.payload;
       })
       .addCase(fetchInvitesByProjectId.rejected, (state, action) => {

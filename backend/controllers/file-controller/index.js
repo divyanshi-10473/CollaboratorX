@@ -22,7 +22,7 @@ export const getFileTreeByProjectId = async (req, res) => {
 export const updateFileContent = async (req, res) => {
   try {
     const { projectId, filename, content } = req.body;
-    console.log(req.body, "Received file content update");
+   
 
     if (!projectId || !filename) {
       return res.status(400).json({ message: 'projectId and filename are required' });
@@ -40,11 +40,11 @@ export const updateFileContent = async (req, res) => {
           contents: content || '',
         },
       };
-      console.log(`File '${filename}' did not exist — created new file.`);
+     
     } else {
       // If file exists, update content
       project.fileTree[filename].file.contents = content;
-      console.log(`File '${filename}' updated.`);
+     
     }
 
     project.markModified('fileTree');

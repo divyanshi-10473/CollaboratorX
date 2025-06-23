@@ -7,16 +7,23 @@ const initialState = {
   ProjectsList: [],
 };
 
+const getAuthHeader = () => {
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 
 
   export const createProject = createAsyncThunk(
     "projects/createProject",
     async (name, { rejectWithValue }) => {
-        console.log("Creating project with name:", name);
+        
       try {
         const response = await axios.post(`${import.meta.env.VITE_SOCKET_URL}/project/create`, name, {
-          withCredentials: true,
+          headers: getAuthHeader()
         });
         return response?.data;
       } catch (err) {
@@ -34,7 +41,7 @@ export const fetchProjects = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/project/get`, {
-        withCredentials: true,
+        headers: getAuthHeader(),
       });
       
       return response?.data; 
@@ -58,7 +65,7 @@ export const inviteCollaborator = createAsyncThunk(
       const response = await axios.post(
         `${import.meta.env.VITE_SOCKET_URL}/project/invite`,
         { projectId, invitedUserId },
-        { withCredentials: true }
+        { headers: getAuthHeader()}
       );
 
       return response?.data;
@@ -78,7 +85,7 @@ export const fetchInvitesByProjectId = createAsyncThunk(
   async (projectId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/project/get/invites/${projectId}`, {
-        withCredentials: true,
+       headers: getAuthHeader(),
       });
       return response.data.invites; 
     } catch (err) {

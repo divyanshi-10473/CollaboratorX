@@ -5,15 +5,24 @@ const initialState={
     isAuthenticated: false,
     isLoading: true,
     UsersList:[],
-    user: null
+    user: null,
+    token: null,
 }
+
+const getAuthHeader = () => {
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_SOCKET_URL}/users/register`, formData, {
-        withCredentials: true,
+       headers: getAuthHeader(),
       });
       return response.data;
     } catch (err) {
@@ -30,7 +39,7 @@ export const loginUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_SOCKET_URL}/users/login`, formData, {
-        withCredentials: true,
+       headers: getAuthHeader(),
       });
       return response.data;
     } catch (err) {
@@ -50,7 +59,7 @@ export const loginWithGitHub = createAsyncThunk(
       const response = await axios.post(
         `${import.meta.env.VITE_SOCKET_URL}/users/github`,
         { code },
-        { withCredentials: true }
+        { headers: getAuthHeader(),}
       );
       return response.data;
     } catch (err) {
@@ -66,9 +75,9 @@ export const getAllUsers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/users/get-user`, {
-        withCredentials: true, 
+        headers: getAuthHeader(),
       });
-
+    
       return response.data; 
     } catch (err) {
       if (err.response && err.response.data) {
@@ -89,7 +98,7 @@ export const logoutUser = createAsyncThunk(
       `${import.meta.env.VITE_SOCKET_URL}/users/logout`,
       {},
       {
-        withCredentials: true,
+        headers: getAuthHeader(),
       }
     );
 
@@ -98,11 +107,11 @@ export const logoutUser = createAsyncThunk(
 );
 export const checkAuth = createAsyncThunk(
   'auth/checkauth',
-  async () => {
+  async (token) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/users/check-auth`,  {
-        withCredentials: true,
         headers: {
+          Authorization: `Bearer ${token}`,
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           
         }
@@ -125,9 +134,13 @@ const authSlice = createSlice({
       name: "auth",
       initialState,
       reducers: {
-        setUser: (state,action)=>{
-              
+        setUser: (state,action)=>{},
+        resetTokenAndCredentials: (state) => {
+          state.token = null;
+          state.user = null;
+          state.isAuthenticated = false;
         }
+
       },
       extraReducers: (builder) => {
         builder
@@ -149,25 +162,30 @@ const authSlice = createSlice({
           .addCase(loginUser.fulfilled, (state, action) => {
             state.isLoading = false;
             state.user =action.payload.success ?   action.payload.user : null ;
-            console.log("login user",action.payload);
             state.isAuthenticated =action.payload.success ? true : false;
+            state.token=  action.payload.token || null ;
+            sessionStorage.setItem('token', JSON.stringify(action.payload.token))
           })
           .addCase(loginUser.rejected, (state) => {
             state.isLoading = false;
             state.user = null;
             state.isAuthenticated = false;
+            state.token = null;
           })
       .addCase(loginWithGitHub.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+     
       })
       .addCase(loginWithGitHub.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
+        state.token=  action.payload.token || null ;
+        sessionStorage.setItem('token', JSON.stringify(action.payload.token))
       })
       .addCase(loginWithGitHub.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+    
+        state.token = null;
       })
           .addCase(checkAuth.pending, (state) => {
             state.isLoading = true;
@@ -189,9 +207,10 @@ const authSlice = createSlice({
                   state.isLoading = true;
           
               }).addCase(getAllUsers.fulfilled,(state,action)=>{
-                  console.log(action?.payload?.data);
+                
                   state.isLoading = false;
                   state.UsersList = action?.payload?.data;
+
               }).addCase(getAllUsers.rejected,(state,action)=>{
                   state.isLoading = false;
                   state.UsersList = [];
@@ -204,5 +223,5 @@ const authSlice = createSlice({
 
 
 
-export const {setUser} = authSlice.actions;
+export const {setUser, resetTokenAndCredentials} = authSlice.actions;
 export default authSlice.reducer;

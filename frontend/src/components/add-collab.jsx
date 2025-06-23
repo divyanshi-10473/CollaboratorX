@@ -47,7 +47,7 @@ function AddCollab({ projectId }) {
         if (!result.isConfirmed) return;
 
         dispatch(deleteConversation(projectId)).unwrap().then((data) => {
-            console.log(data, "this is the data from delete conversation", data?.success)
+           
             if (data?.success) {
                 toast.success(data?.message, { position: 'bottom-right' })
                 setShowTeammates(false)
@@ -85,7 +85,7 @@ async function handleDeleteInvite(inviteId) {
   dispatch(deleteInvite(inviteId))
     .unwrap()
     .then((data) => {
-      console.log("Deleted invite:", inviteId);
+    
       toast.success("Invite removed successfully.", { position: "bottom-right" });
       dispatch(fetchInvitesByProjectId(projectId));
     })
@@ -121,7 +121,7 @@ async function handleDeleteInvite(inviteId) {
     return (
         <div className=' top-0 flex-shrink-0  bg-[rgb(24,32,46)]  z-10  border-b border-teal-800/40 h-[50px]'>
             <div className="flex items-center justify-between mb-6 ">
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Dialog >
                     <DialogTrigger asChild>
                         <Button className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-sm">
                             <UserPlus size={16} /> Add Collaborator

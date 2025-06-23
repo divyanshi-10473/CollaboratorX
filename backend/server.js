@@ -25,21 +25,21 @@ const io = new Server(server, {
 io.use(async (socket, next) => {
   try {
 
-    const cookies = socket.handshake.headers.cookie;
-    if (!cookies) {
-      return next(new Error('Authentication error: No cookies found'));
-    }
+    // const cookies = socket.handshake.headers.cookie;
+    // if (!cookies) {
+    //   return next(new Error('Authentication error: No cookies found'));
+    // }
 
-    const parsedCookies = cookie.parse(cookies);
-    const token = parsedCookies.token;
+    // const parsedCookies = cookie.parse(cookies);
+ const token = socket.handshake.auth?.token;
 
-    if (!token) {
-      return next(new Error('Authentication error: No token cookie'));
-    }
+if (!token) {
+  return next(new Error('Authentication error: No token provided'));
+}
 
+const decoded = jwt.verify(token, process.env.JWT_SECRET);
+socket.user = decoded;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = decoded;
 
 
     const projectId = socket.handshake.query.projectId;
@@ -97,7 +97,7 @@ socket.on('project-message', async data => {
         };
 
         await project.save();
-        console.log("file emmitted successfully")
+       
         io.to(socket.project._id.toString()).emit('fileTreeUpdated')
         
 
