@@ -22,9 +22,6 @@ export async function getGitHubAccessToken(code) {
   return response.data.access_token;
 }
 
-/**
- * Get GitHub user profile using access token.
- */
 export async function getGitHubUser(accessToken) {
   const response = await axios.get('https://api.github.com/user', {
     headers: {

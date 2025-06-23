@@ -32,6 +32,8 @@ function AddCollab({ projectId }) {
     const { UsersList } = useSelector((state) => state.auth);
     const { invites } = useSelector((state) => state.projectInvites);
 
+    console.log(UsersList, "y asli");
+
 
     async function handleDelete() {
         const result = await Swal.fire({

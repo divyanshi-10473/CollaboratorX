@@ -207,7 +207,8 @@ const authSlice = createSlice({
                   state.isLoading = true;
           
               }).addCase(getAllUsers.fulfilled,(state,action)=>{
-                
+                  console.log(action?.payload?.data, "ye data h");
+                  console.log(action?.payload, "without data");
                   state.isLoading = false;
                   state.UsersList = action?.payload?.data;
 
