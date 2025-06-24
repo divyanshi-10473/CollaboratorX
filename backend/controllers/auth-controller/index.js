@@ -220,7 +220,6 @@ export const loginWithGithub = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const currentUserId = req.user.id; 
-
     const users = await User.find({ _id: { $ne: currentUserId } }).select('_id username email');
 
     res.status(200).json(

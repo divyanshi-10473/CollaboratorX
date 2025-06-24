@@ -1,13 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const initialState={
-    isAuthenticated: false,
-    isLoading: true,
-    UsersList:[],
-    user: null,
-    token: null,
-}
+const storedToken = JSON.parse(sessionStorage.getItem("token"));
+
+const initialState = {
+  isAuthenticated: !!storedToken,
+  isLoading: false,
+  UsersList: [],
+  user: null,
+  token: storedToken || null,
+};
+
 
 const getAuthHeader = () => {
   const token = JSON.parse(sessionStorage.getItem("token"));
@@ -180,6 +183,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.user;
         state.token=  action.payload.token || null ;
+        state.isAuthenticated = true;
         sessionStorage.setItem('token', JSON.stringify(action.payload.token))
       })
       .addCase(loginWithGitHub.rejected, (state, action) => {

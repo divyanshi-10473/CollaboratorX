@@ -26,6 +26,9 @@ function GitHubCallback() {
     if (code) {
 dispatch(loginWithGitHub(code)).then((res) => {
   if (res?.payload?.success) {
+    // ✅ Save token in sessionStorage immediately
+    sessionStorage.setItem('token', res.payload.token);
+
     toast.success("Login successful!", {
       position: 'bottom-right',
     });
@@ -33,7 +36,6 @@ dispatch(loginWithGitHub(code)).then((res) => {
     dispatch(checkAuth()).then(() => {
       navigate("/project");
     });
-
   } else {
     toast.error("Login failed", {
       position: 'bottom-right',
@@ -41,6 +43,7 @@ dispatch(loginWithGitHub(code)).then((res) => {
     navigate("/login");
   }
 });
+
 
     } else {
       console.warn("No code received from GitHub");
