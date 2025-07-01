@@ -5,16 +5,16 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     react(),
-    // {
-    //   name: 'custom-headers',
-    //   configureServer(server) {
-    //     server.middlewares.use((req, res, next) => {
-    //       res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
-    //       res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
-    //       next()
-    //     })
-    //   }
-    // }
+    {
+      name: 'custom-headers',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+          res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+          next()
+        })
+      }
+    }
   ],
   resolve: {
     alias: {
