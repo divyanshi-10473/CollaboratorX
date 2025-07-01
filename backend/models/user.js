@@ -16,21 +16,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
 
-  authProvider: {
-    type: String,
-    enum: ['local', 'github'],
-    default: 'local',
-  },
 
-  githubId: {
-    type: String,
-    unique: true,
-    sparse: true, 
-  },
-
-  avatar: {
-    type: String,
-  },
 });
 
 const User = mongoose.model('User', UserSchema);

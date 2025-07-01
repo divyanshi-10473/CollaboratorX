@@ -39,9 +39,6 @@ export default function Login() {
     }
   };
 
-  const handleGitHubLogin = () => {
-  window.location.href = `https://github.com/login/oauth/authorize?client_id=${import.meta.env.VITE_GITHUB_CLIENT_ID}&scope=user`;
-};
 
 
   return (
@@ -89,14 +86,7 @@ export default function Login() {
             }}
           >
             <h2 className="text-2xl font-bold text-white text-center">Login</h2>
-            <Button
-  onClick={handleGitHubLogin}
-  variant="outline"
-  className="flex items-center gap-2 w-full justify-center"
->
-  <img src={img} alt="GitHub" className="w-6 h-6" />
-  Continue with GitHub
-</Button>
+
 
             <form onSubmit={onSubmit} className="space-y-4">
               <div>

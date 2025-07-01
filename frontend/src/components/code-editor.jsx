@@ -77,8 +77,6 @@ useEffect(() => {
     if (projectId) {
       dispatch(fetchFileTree(projectId));
     }
-    webContainer?.mount(FileTrees)
-
 
   }, [dispatch, projectId])
 
@@ -430,8 +428,13 @@ useEffect(() => {
   </button>
   <button
     onClick={async () => {
+
+    if (!webContainer) {
+    toast.error("WebContainer not ready yet");
+    return;
+  }
       setTerminalOutput('');
-      webContainer.mount(FileTrees);
+      await webContainer.mount(FileTrees);
 
       const installProcess = await webContainer.spawn("npm", ["install"]);
       installProcess.output.pipeTo(new WritableStream({

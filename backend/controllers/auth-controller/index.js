@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import User from '../../models/user.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { getGitHubAccessToken, getGitHubPrimaryEmail, getGitHubUser } from '../../service/github.js';
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -36,8 +35,6 @@ export const registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      authProvider: 'local',
-      profilePic: null, 
     });
 
     await newUser.save();
@@ -135,84 +132,6 @@ export const authMiddleware = async (req, res, next) => {
   }
 };
 
-export const loginWithGithub = async (req, res) => {
-  try {
-    const { code } = req.body;
-
-    if (!code) {
-      return res.status(400).json({ success: false, message: 'GitHub authorization code is required' });
-    }
-
-   
-    const accessToken = await getGitHubAccessToken(code);
-    if (!accessToken) {
-      return res.status(401).json({ success: false, message: 'Failed to get GitHub access token' });
-    }
-
-  
-    const githubUser = await getGitHubUser(accessToken);
-    let email = githubUser.email;
-
-    if (!email) {
-   
-      email = await getGitHubPrimaryEmail(accessToken);
-      if (!email) {
-        return res.status(401).json({ success: false, message: 'GitHub email not accessible' });
-      }
-    }
-
- 
-    let user = await User.findOne({ email });
-
-    if (!user) {
-      user = await User.create({
-        username: githubUser.login,
-        email,
-        authProvider: 'github',
-        profilePic: githubUser.avatar_url,
-        password: null,
-      });
-    }
-
-    const token = jwt.sign(
-      { id: user._id, name: user.username, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // res.cookie('token', token, {
-    //   httpOnly: true,
-    //   secure: false,
-    // }).json({
-    //   success: true,
-    //   message: 'Logged in with GitHub successfully',
-    //   user: {
-    //     id: user._id,
-    //     username: user.username,
-    //     email: user.email,
-    //   },
-    // });
-
-        res.status(200).json({
-      success: true,
-      message: 'Logged in successfully',
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-      },
-
-    })
-
-  } catch (error) {
-    console.error('GitHub login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'GitHub login failed',
-    });
-  }
-};
 
 
 

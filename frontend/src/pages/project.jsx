@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   Plus,
-  Bell,
+
   LogOut,
-  UserCog
+
 } from 'lucide-react';
 
 import avatar from '../assets/avtar.png';
 import pro from '../assets/noProject.png'
-import emptyState from '../assets/avtar.png';        // ← your "no projects" image
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +38,7 @@ import NotificationPopover from '@/components/notification';
 const Project = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const currentUserId = user.id;
+  const currentUserId = user?.id;
 
   const { ProjectsList } = useSelector((state) => state.project);
   const dispatch = useDispatch();

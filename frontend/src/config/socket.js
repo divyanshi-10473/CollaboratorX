@@ -10,7 +10,7 @@ export const initializeSocket = (projectId) => {
   }
 
 
-const token = JSON.parse(sessionStorage.getItem("token")); // or localStorage
+    const token = JSON.parse(sessionStorage.getItem("token"))
 
 if (!socketInstance) {
   socketInstance = io(import.meta.env.VITE_SOCKET_URL, {

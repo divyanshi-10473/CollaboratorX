@@ -55,21 +55,7 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const loginWithGitHub = createAsyncThunk(
-  'auth/loginWithGitHub',
-  async (code, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_SOCKET_URL}/users/github`,
-        { code },
-        { headers: getAuthHeader(),}
-      );
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || 'GitHub login failed');
-    }
-  }
-);
+
 
 
 
@@ -175,22 +161,6 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.token = null;
           })
-      .addCase(loginWithGitHub.pending, (state) => {
-        state.isLoading = true;
-     
-      })
-      .addCase(loginWithGitHub.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload.user;
-        state.token=  action.payload.token || null ;
-        state.isAuthenticated = true;
-        sessionStorage.setItem('token', JSON.stringify(action.payload.token))
-      })
-      .addCase(loginWithGitHub.rejected, (state, action) => {
-        state.isLoading = false;
-    
-        state.token = null;
-      })
           .addCase(checkAuth.pending, (state) => {
             state.isLoading = true;
           })
