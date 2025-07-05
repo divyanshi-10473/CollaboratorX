@@ -8,6 +8,8 @@ import { getWebContainer } from '@/config/webContainer';
 import { FilePlus, FilePlus2 } from 'lucide-react';
 import { getSocket } from '@/config/socket';
 
+import MonacoEditor from '@monaco-editor/react';
+
 const Editor = ({ projectId }) => {
 
   const dispatch = useDispatch();
@@ -142,8 +144,8 @@ useEffect(() => {
     });
   };
 
-  const handleChange = (e) => {
-    const newContent = e.target.value;
+  const handleChange = (value) => {
+    const newContent = value ;
     setLocalContent(newContent);
     debouncedSave(currentFile, newContent);
   };
@@ -243,6 +245,20 @@ useEffect(() => {
       setLocalContent('');
     }
 
+  };
+
+
+    const getLanguageForFile = (filename) => {
+    if (!filename) return 'plaintext';
+    if (filename.endsWith('.js')) return 'javascript';
+    if (filename.endsWith('.ts')) return 'typescript';
+    if (filename.endsWith('.json')) return 'json';
+    if (filename.endsWith('.html')) return 'html';
+    if (filename.endsWith('.css')) return 'css';
+    if (filename.endsWith('.md')) return 'markdown';
+    if (filename.endsWith('.py')) return 'python';
+    if (filename.endsWith('.java')) return 'java';
+    return 'plaintext';
   };
 
   const closeIframe = () => {
@@ -367,7 +383,7 @@ useEffect(() => {
         </ul>
       </aside>
 
-      <main className="flex-1 bg-gray-700 text-green-200 overflow-auto flex flex-col">
+      <main className="flex-1 bg-gray-700 overflow-auto flex flex-col">
         {iframeVisible && iframeUrl && (
 
           <div
@@ -421,44 +437,76 @@ useEffect(() => {
 
 <div className='actions flex gap-1 h-6'>
     <button
-    onClick={() => setIsTerminalVisible(prev => !prev)}
-    className='px-3 rounded-sm bg-slate-100 text-black hover:bg-slate-300'
-  >
-    Terminal
-  </button>
-  <button
-    onClick={async () => {
-
-        if (!webContainer) {
+onClick={async () => {
+  if (!webContainer) {
     toast.error("WebContainer not ready yet");
     return;
   }
-      setTerminalOutput('');
-      await webContainer.mount(FileTrees);
 
-      const installProcess = await webContainer.spawn("npm", ["install"]);
-      installProcess.output.pipeTo(new WritableStream({
-        write(chunk) {
-          appendToTerminal(chunk);
-        }
-      }));
+  setTerminalOutput('');
+  await webContainer.mount(FileTrees);
 
-      if (runProcess) runProcess.kill();
+  const hasPackageJson = Object.keys(FileTrees).includes('package.json');
+  const htmlFiles = Object.keys(FileTrees).filter(file => file.endsWith('.html'));
 
-      const tempRunProcess = await webContainer.spawn("npm", ["start"]);
-      tempRunProcess.output.pipeTo(new WritableStream({
-        write(chunk) {
-          appendToTerminal(chunk);
-        }
-      }));
+  if (hasPackageJson) {
+    // Node.js project
+    const installProcess = await webContainer.spawn("npm", ["install"]);
+    installProcess.output.pipeTo(new WritableStream({
+      write(chunk) {
+        appendToTerminal(chunk);
+      }
+    }));
 
-      setRunProcess(tempRunProcess);
+    if (runProcess) runProcess.kill();
 
-      webContainer.on('server-ready', (port, url) => {
-        setIframeUrl(url);
-        setIframeVisible(true);
-      });
-    }}
+    const tempRunProcess = await webContainer.spawn("npm", ["start"]);
+    tempRunProcess.output.pipeTo(new WritableStream({
+      write(chunk) {
+        appendToTerminal(chunk);
+      }
+    }));
+
+    setRunProcess(tempRunProcess);
+
+    webContainer.on('server-ready', (port, url) => {
+      setIframeUrl(url);
+      setIframeVisible(true);
+    });
+  }
+  else if (htmlFiles.length > 0) {
+    // HTML project
+    appendToTerminal('Installing serve...\n');
+    const installServe = await webContainer.spawn("npm", ["install", "serve"]);
+
+    installServe.output.pipeTo(new WritableStream({
+      write(chunk) {
+        appendToTerminal(chunk);
+      }
+    }));
+
+    appendToTerminal('Starting server...\n');
+    const serveProcess = await webContainer.spawn("npx", ["serve", ".", "-l", "3000"]);
+
+    serveProcess.output.pipeTo(new WritableStream({
+      write(chunk) {
+        appendToTerminal(chunk);
+      }
+    }));
+
+    setRunProcess(serveProcess);
+
+    webContainer.on('server-ready', (port, url) => {
+      setIframeUrl(url);
+      setIframeVisible(true);
+    });
+  }
+  else {
+    toast.error("Cannot detect project type (no package.json or HTML files).");
+  }
+}}
+
+
     className='px-3 rounded-sm bg-slate-100 text-black hover:bg-slate-300'
   >
     Run
@@ -471,19 +519,33 @@ useEffect(() => {
         </div>
 
 
-        <div className="flex-1 overflow-y-auto">
-          {currentFile ? (
-            <textarea
-              className="w-full h-full p-4 bg-slate-700 resize-none outline-none font-mono text-sm"
-              value={localContent}
-              onChange={handleChange}
-            />
-          ) : (
-            <div className="h-full flex items-center justify-center text-gray-500 italic">
-              Select a file from the Explorer to view/edit
-            </div>
-          )}
-        </div>
+ <div className="flex-1 overflow-y-auto">
+        {currentFile ? (
+          <MonacoEditor
+            height="100%"
+            theme="vs-dark"
+            language={getLanguageForFile(currentFile)}
+            value={localContent}
+            onChange={handleChange}
+            options={{
+              fontSize: 14,
+              minimap: { enabled: true },
+              wordWrap: 'on',
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              tabSize: 2,
+              formatOnType: true,
+              formatOnPaste: true,
+              renderWhitespace: 'all',
+              smoothScrolling: true,
+            }}
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-gray-500 italic">
+            Select a file from the Explorer to view/edit
+          </div>
+        )}
+      </div>
 
 
 {isTerminalVisible && (
