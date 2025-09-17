@@ -184,6 +184,12 @@ const WriteAiMessage = (msg) => {
           <div ref={msgEndRef} />
         </div>
 
+
+           {/* <div
+          className="flex-1 pt-16 md:pt-0 pb-7 overflow-y-auto mb-4 space-y-2 "
+         
+        ></div> */}
+
  
         <div className="flex items-center gap-2 h-[50px] bg-[rgb(24,32,46)] fixed md:relative bottom-0 p-4 md:p-0 left-2 right-4">
           <Input
@@ -203,7 +209,7 @@ const WriteAiMessage = (msg) => {
 
     
       <div className="hidden md:flex flex-1 h-full">
-        <Editor projectId={projectId} />
+        {/* <Editor projectId={projectId} /> */}
       </div>
     </div>
   );

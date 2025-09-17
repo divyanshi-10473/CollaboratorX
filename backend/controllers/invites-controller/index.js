@@ -81,20 +81,20 @@ export const getInvitesForUser = async (req, res) => {
 
 export const acceptInvite = async (req, res) => {
   try {
-    // 1) Find the invite
+   
     const invite = await projectInvite.findById(req.params.inviteId);
     if (!invite) return res.status(404).json({ message: 'Invite not found' });
 
-    // 2) Permission check
+   
     if (invite.invitedUser.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    // 3) Mark invite as accepted
+  
     invite.status = 'added'; 
     await invite.save();
 
-    // 4) Add user to the project, without shadowing the model
+  
     const project = await Project.findById(invite.projectId);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
@@ -104,7 +104,7 @@ export const acceptInvite = async (req, res) => {
       await project.save();
     }
 
-    // 5) Return the updated invite
+  
     res.status(200).json({ message: 'Invite accepted', invite });
   } catch (error) {
     console.error('Accept Invite Error:', error);
@@ -131,7 +131,6 @@ export const rejectInvite = async (req, res) => {
     res.status(500).json({ message: 'Failed to reject invite', error });
   }
 };
-
 
 
 
