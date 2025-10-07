@@ -136,7 +136,7 @@ export default function Login() {
         </div>
       </div>
             <footer className="text-center py-4 text-gray-500 text-sm border-t border-white/10">
-        &copy; 2025 Divyanshi. All rights reserved.
+        {/* &copy; 2025 Divyanshi. All rights reserved. */}
       </footer>
     </div>
   );
