@@ -209,7 +209,7 @@ const WriteAiMessage = (msg) => {
 
     
       <div className="hidden md:flex flex-1 h-full">
-        {/* <Editor projectId={projectId} /> */}
+        <Editor projectId={projectId} />
       </div>
     </div>
   );
