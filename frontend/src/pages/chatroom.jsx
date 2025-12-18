@@ -30,7 +30,7 @@ const Chatroom = () => {
 
   const [chatOpen, setChatOpen] = useState(true);
   const msgEndRef = useRef(null);
-  const scrollContainerRef = useRef(null);
+  // const scrollContainerRef = useRef(null);
   const socketRef = useRef(null);
 
   const scrollToBottom = useCallback(() => {
@@ -94,7 +94,7 @@ const WriteAiMessage = (msg) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [ scrollToBottom]);
+  }, [messagesList, scrollToBottom]);
 
   useEffect(()=>{
     dispatch(fetchMessagesByProject(projectId))
@@ -136,7 +136,7 @@ const WriteAiMessage = (msg) => {
 
         <div
           className="flex-1 pt-16 md:pt-0 pb-7 overflow-y-auto mb-4 space-y-2 scrollbar-hide"
-          ref={scrollContainerRef}
+          // ref={scrollContainerRef}
         >
           {messagesList.length === 0 ? (
             <p className="text-gray-500 text-sm">No messages yet.</p>
